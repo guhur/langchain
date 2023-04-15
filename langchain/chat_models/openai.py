@@ -262,7 +262,14 @@ class ChatOpenAI(BaseChatModel):
             message = _convert_dict_to_message(
                 {"content": inner_completion, "role": role}
             )
-            return ChatResult(generations=[ChatGeneration(message=message)])
+            chat_result = ChatResult(generations=[ChatGeneration(message=message)])
+            # EDIT: add on_llm_end
+            self.callback_manager.on_llm_end(
+                chat_result,
+                verbose=self.verbose,
+            )
+            # END EDIT
+            return chat_result
         response = self.completion_with_retry(messages=message_dicts, **params)
         return self._create_chat_result(response)
 
